@@ -9,12 +9,23 @@ public class Player : MonoBehaviour {
 	public float speed = 100f;
 	public float jumpPower = 300f;
 	public float friction = 0.7f;
+	public float gravity = 0.5f;
 	private int currentScale = 2;
+
+	// Stats
+	public float health = 100f;
+	public float damage = 20f;
+	public float maxCharge = 100f;
+	public float currentCharge = 0f;
+	public float chargeAmount = 10f;
+	// One second, 10 sec for max charge
+	public float chargeTimer = 1.0f;
+	public float chargeTolerance = 2.0f;
 
 	// Booleans
 	public bool grounded;
-	// public bool canDoubleJump;
-
+	public bool charging;
+	public bool crouching;
 
 	// References
 	private Rigidbody2D rb2d;
@@ -28,9 +39,13 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update() {
+		// Current horizontal speed
+		float currentSpeed = Mathf.Abs(rb2d.velocity.x);
+
 		// Set animation parameters
 		anim.SetBool("Grounded", grounded);
-		anim.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
+		anim.SetBool("Charge", charging);
+		anim.SetFloat("Speed", currentSpeed);
 
 		// Change sprite direction
 		if(Input.GetAxis("Horizontal") < -0.1f) {
@@ -40,26 +55,56 @@ public class Player : MonoBehaviour {
 			transform.localScale = new Vector3(currentScale, currentScale, 1);
 		}
 
-		// Jump 
-		if(Input.GetButtonDown("Jump")) {
-			if(grounded) {
-				rb2d.AddForce(Vector2.up * jumpPower);
-				// canDoubleJump = true;
-			}
-			// else {
-			// 	if(canDoubleJump) {
-			// 		canDoubleJump = false;
-			// 		// Reset y velocity so can jump up no matter how much force going down
-
-			// 		rb2d.velocity = new Vector2(rb2d.velocity.x, 0);
-			// 		rb2d.AddForce(Vector2.up * jumpPower / 1.75f);
-			// 	}
-			// }
+		// Jump (single only)
+		if(Input.GetButtonDown("Jump") && grounded) {
+			rb2d.AddForce(Vector2.up * jumpPower);
 		}
+
+		// Crouch, stop movement 
+		if(Input.GetKeyDown("s") && grounded) {
+			crouching = true;
+			anim.SetBool("Crouch", crouching);
+		}
+
+		if(Input.GetKeyUp("s")) {
+			crouching = false;
+			anim.SetBool("Crouch", crouching);
+		}
+
+		// Energy charge (left shift)
+		if(Input.GetKeyDown(KeyCode.LeftShift) && grounded && currentSpeed <= chargeTolerance) {
+
+			charging = true;
+			anim.SetBool("Charge", charging);
+
+			anim.Play("player charge");
+		}
+
+		if(Input.GetKeyUp(KeyCode.LeftShift) || !grounded || currentSpeed > chargeTolerance) {
+
+			charging = false;
+			anim.SetBool("Charge", charging);
+		}
+
+		// Charging check
+		if(charging) {
+			if(chargeTimer > 0) {
+				chargeTimer -= Time.deltaTime;
+			}
+			else {
+				if(currentCharge < 100) {
+					currentCharge += chargeAmount;
+				}
+				// Reset timer
+				chargeTimer = 1.0f;
+			}
+		}
+				
 	}
 
 	void FixedUpdate() {
 		float horizontal = Input.GetAxis("Horizontal");
+		// Gravity and friction
 		Vector3 easeVelocity = rb2d.velocity;
 
 		// Moving the player
@@ -77,10 +122,14 @@ public class Player : MonoBehaviour {
 		// Fake friction
 		if(grounded) {
 			// Doesn't affect fall speed, z axis isn't used, x is 75% of speed
-			easeVelocity.y = rb2d.velocity.y;
 			easeVelocity.z = 0.0f;
+			easeVelocity.y = rb2d.velocity.y;
 			easeVelocity.x *= friction;
 			rb2d.velocity = easeVelocity;
+		}
+
+		if(crouching) {
+			rb2d.velocity = Vector3.zero;
 		}
 	}
 }
