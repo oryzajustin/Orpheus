@@ -8,14 +8,15 @@ public class Music_Bar : MonoBehaviour
     public Collider2D bar_Collider;
     public CircleCollider2D cir_Collider;
 
-    private static double multiplier = 1; //Current Multiplier
+    public static double multiplier = 1; //Current Multiplier
+    public int combo = 0;
+    
     private const double MISSMULT = 0.5; //Miss multiplier
     private const double HITMULT = 2; //Hit Multiplier
-    private int combo = 0;
 
     private bool hit; //Checks to see if the note has been hit
-    private bool onbeat = false;
-    private bool firsthit = false;
+    private bool onbeat = false; //Checks to see if the note has been hit on beat
+    private bool firsthit = false;//Used to prevent spamming of space key
 
     // Use this for initialization
     void Start()
