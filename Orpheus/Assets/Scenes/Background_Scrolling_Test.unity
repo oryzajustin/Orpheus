@@ -343,9 +343,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrolling: 1
-  parallax: 1
+  parallax: 0
   size: 28.73
-  parallaxSpd: -0.3
+  parallaxSpd: 0.3
 --- !u!4 &818150764
 Transform:
   m_ObjectHideFlags: 0
