@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: 
+  tags:
+  - MainPunch1
+  - MainPunch2
+  - MainPunch3
+  - Headbutt
+  - SpecialPunch1
+  - AirKick
   layers:
   - Default
   - TransparentFX
