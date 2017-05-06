@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Player : MonoBehaviour {
 
@@ -35,7 +36,8 @@ public class Player : MonoBehaviour {
 	void Start() {
 		rb2d = gameObject.GetComponent<Rigidbody2D>();
 		anim = gameObject.GetComponent<Animator>();
-	}
+
+    }
 	
 	// Update is called once per frame
 	void Update() {
@@ -98,7 +100,7 @@ public class Player : MonoBehaviour {
 				// Reset timer
 				chargeTimer = 1.0f;
 			}
-		}
+        }
 				
 	}
 
