@@ -38,7 +38,7 @@ public class Beat : MonoBehaviour
 
         //Spead of beats
         song = 7;
-        speed = bpm[song] / 10;
+        speed = bpm[song] / 15;
 
         //Location for new beats to be spawned
         loc = new Vector2(10.5f, -3.35f);
