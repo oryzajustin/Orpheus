@@ -1,0 +1,34 @@
+# =============== #
+# Unity generated #
+# =============== #
+Orpheus/Temp/
+Orpheus/Obj/
+Orpheus/UnityGenerated/
+Orpheus/Library/
+Orpheus/Assets/AssetStoreTools*
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+Orpheus/ExportedObj/
+Orpheus/*.svd
+Orpheus/*.userprefs
+Orpheus/*.csproj
+Orpheus/*.pidb
+Orpheus/*.suo
+Orpheus/*.sln
+Orpheus/*.user
+Orpheus/*.unityproj
+Orpheus/*.booproj
+
+# ============ #
+# OS generated #
+# ============ #
+Orpheus/.DS_Store
+Orpheus/.DS_Store?
+Orpheus/._*
+Orpheus/.Spotlight-V100
+Orpheus/.Trashes
+Orpheus/Icon?
+Orpheus/ehthumbs.db
+Orpheus/Thumbs.db
