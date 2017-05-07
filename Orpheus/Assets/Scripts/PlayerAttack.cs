@@ -18,8 +18,8 @@ public class PlayerAttack : MonoBehaviour {
 	////////////////////
 	// Floats
 	////////////////////
-	private float attackTimeCounter;
-	private float attackCd = 1f;
+	private float attackTimeCounter = 0f;
+	private float attackCd = 0.3f;
 
 	////////////////////
 	// Booleans
@@ -32,13 +32,6 @@ public class PlayerAttack : MonoBehaviour {
 	// References
 	////////////////////
 	private Animator anim;
-	public Collider2D MainPunch1;
-	public Collider2D MainPunch2;
-	public Collider2D MainPunch3;
-	public Collider2D Headbutt;
-	public Collider2D SpecialPunch1;
-	public Collider2D AirKick;
-
 
 	void Awake() {
 
