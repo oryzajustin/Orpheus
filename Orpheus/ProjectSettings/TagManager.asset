@@ -65,3 +65,15 @@ TagManager:
   - name: Foreground
     uniqueID: 4035114517
     locked: 0
+  - name: Mob
+    uniqueID: 478285895
+    locked: 0
+  - name: Music Bar
+    uniqueID: 3992286369
+    locked: 0
+  - name: Trigger
+    uniqueID: 2553592643
+    locked: 0
+  - name: Beat
+    uniqueID: 2185821513
+    locked: 0

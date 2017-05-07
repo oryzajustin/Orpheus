@@ -41,7 +41,7 @@ public class Beat : MonoBehaviour
         speed = bpm[song] / 15;
 
         //Location for new beats to be spawned
-        loc = new Vector2(10.5f, -3.35f);
+        loc = new Vector2(transform.position.x, transform.position.y);
         rot = new Quaternion(0, 0, 0, 0);
 
         //Calls Instantiate function for 0.5s and repeats every 0s
@@ -61,7 +61,7 @@ public class Beat : MonoBehaviour
     //Deletes the beats once it hits the end of the music bar
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.name == "Music_Bar")
+        if (collision.gameObject.name == "Music_Bar" || collision.gameObject.name == "Player")
         {
             Destroy(gameObject);
         }

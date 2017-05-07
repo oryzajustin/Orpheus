@@ -9,7 +9,7 @@ public class Player : MonoBehaviour {
 	////////////////////
 	private KeyCode Left = KeyCode.A;
 	private KeyCode Right = KeyCode.D;
-	private KeyCode Jump = KeyCode.Space;
+	private KeyCode Jump = KeyCode.W;
 	private KeyCode Down = KeyCode.S;
 	private KeyCode Charge = KeyCode.LeftShift;
 
