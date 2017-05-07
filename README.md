@@ -22,3 +22,6 @@ This project is a combat game based around the music of the game. The player mus
 ## Challenges
 - Boss actions hard to implement
 - Health UI is challenging to create
+
+## Implementation Dev Ideas
+- Have the player do 0 damage initially, when they hit on beat they get += 0.5, then every beat after that is x2, capping at x8 (4 damage)
