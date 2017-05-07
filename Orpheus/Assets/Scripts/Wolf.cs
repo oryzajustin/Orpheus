@@ -8,18 +8,23 @@ public class Wolf : MonoBehaviour {
 	// Integers
 	////////////////////
 	public int currentHealth;
-	public int maxHealth = 50;
+	public int maxHealth = 10;
 
 	////////////////////
 	// Floats
 	////////////////////
 	public float distance;
-	public float awakeRange = 10f;
-	public float attackRange = 3f;
-	public float attackInterval = 2f;
-	public float attackCd;
+	public float speed = 12f;
 	public float maxSpeed = 4f;
-	public float leapCd;
+	public float leapPower = 100f;
+	public float awakeRange = 12f;
+	public float attackRange = 5f;
+	public float attackWaitCounter = 0f;
+	public float attackWaitDuration = 4f;
+	public float attackDurationCounter = 0f;
+	public float attackDuration = 0.2f;
+	public float friction = 0.6f;
+	public float deathTimer = 3f;
 
 	////////////////////
 	// Booleans
@@ -28,11 +33,13 @@ public class Wolf : MonoBehaviour {
 	public bool attacking = false;
 	public bool leap = false;
 	public bool attackReady = false;
+	public bool knockbacked = false;
+	public bool damaged = false;
 
 	////////////////////
 	// References
 	////////////////////
-	private Rigidbody2D rb2d;
+	public Rigidbody2D rb2d;
 	public Transform target;
 	public Transform attackPoint;
 	public Animator anim;
@@ -43,145 +50,197 @@ public class Wolf : MonoBehaviour {
 		rb2d = gameObject.GetComponent<Rigidbody2D>();
 		anim = gameObject.GetComponent<Animator>();
 
-		GameObject objWolfAttack = GameObject.FindWithTag("AttackHitbox");
- 		if(objWolfAttack != null) {
- 			WolfAttack = objWolfAttack.GetComponent<Collider2D>();
- 		}
-
- 		WolfAttack.enabled = false;
-
 	}
 
 	void Start() {
+
 		currentHealth = maxHealth;
  		
 	}
 
 	void Update() {
+
+		////////////////////
+		// Get wolf speed
+		////////////////////
 		float velocity = rb2d.velocity.x;
 		float speed = Mathf.Abs(velocity);
 		distance = Vector2.Distance(transform.position, target.transform.position);
 
+		////////////////////
 		// Set animator parameters
+		////////////////////
 		anim.SetBool("Awake", awake);
 		anim.SetFloat("Speed", speed);
 		anim.SetBool("Attacking", attacking);
 
-		// Change sprite direction
-		if(velocity < -0.1f) {
-			transform.localScale = new Vector3(1, 1, 1);
-		}
-		if(velocity > 0.1f) {
-			transform.localScale = new Vector3(-1, 1, 1);
+		////////////////////
+		// No moving if hit
+		////////////////////
+		if(!knockbacked) {
+			////////////////////
+			// Change sprite direction
+			////////////////////
+			if(velocity < -0.1f) {
+				transform.localScale = new Vector3(1, 1, 1);
+			}
+			if(velocity > 0.1f) {
+				transform.localScale = new Vector3(-1, 1, 1);
+			}
+
+			////////////////////
+			// Update awake
+			////////////////////
+			AwakeCheck(distance);
+
+			////////////////////
+			// Attack
+			////////////////////
+			if(distance <= attackRange) {
+				attackReady = true;
+				anim.SetBool("AttackReady", attackReady);
+				rb2d.velocity = Vector3.zero; // Stops moving
+				if(!attacking) {
+					if(attackWaitCounter < attackWaitDuration) {
+						attackReady = true;
+						attackWaitCounter += Time.deltaTime;
+					}
+					else {
+						attackWaitCounter = 0;
+						attackReady = false;
+						anim.SetBool("AttackReady", attackReady);
+						attacking = true;
+						anim.SetBool("Attacking", attacking);
+
+						anim.Play("Wolf_Attack");
+					}
+				}
+				if(attacking) {
+					if(attackDurationCounter < attackDuration) {
+						attackDurationCounter += Time.deltaTime;
+					}
+					else {
+						attacking = false;
+						attackDurationCounter = 0;
+					}
+				}
+			}
+			else {
+				attackReady = false;
+				anim.SetBool("AttackReady", attackReady);
+			}
 		}
 
-		AwakeCheck(distance);
-
-		// Reset last hitbox
-		WolfAttack.enabled = false;
-
-		if(distance < attackRange && !attacking) {
-			anim.SetBool("AttackReady", true);
-			attackReady = true;
-			// Stop movement
-			rb2d.velocity = Vector3.zero;
-			Attack();
+		if(currentHealth <= 0 && !damaged) {
+			anim.Play("Wolf_Damaged");
+			damaged = true;
 		}
 
-		else {
-			anim.SetBool("AttackReady", false);
-			attackReady = false;
-		}
 	}
 
 	void FixedUpdate() {
 
+		if(awake && !knockbacked && !damaged) {
 
-
-		if(awake) {
+			////////////////////
+			// Get direction of player
+			////////////////////
 			Vector2 direction = target.transform.position - transform.position;
 
-			// Move wolf in player direction
+			////////////////////
+			// Move wolf in player direction, stop if ready to attack
+			////////////////////
 			if(!attackReady) {
-				rb2d.AddForce(direction * 5);
+				rb2d.AddForce(direction * speed);
+			}
+			else {
+				rb2d.velocity = Vector3.zero;
 			}
 
+			////////////////////
 			// Limit max speed
+			////////////////////
 			if(rb2d.velocity.x > maxSpeed) {
 				rb2d.velocity = new Vector2(maxSpeed, rb2d.velocity.y);
 			}
-
 			if(rb2d.velocity.x < -maxSpeed) {
 				rb2d.velocity = new Vector2(-maxSpeed, rb2d.velocity.y);
 			}
 
-			if(leap) {
-
-				direction.Normalize();
-				// Debug.Log(direction.x);
-				// Facing left
-				if(direction.x < -0.1) {
-					rb2d.AddForce(Vector2.left * 100);
-				}
-				else {
-					rb2d.AddForce(Vector2.right * 100);
-				}
-
+			////////////////////
+			// Make wolf leap forward during attacks
+			////////////////////
+			if(attacking) {
+				rb2d.AddForce(direction * leapPower);
 			}
 
-					Vector3 easeVelocity = rb2d.velocity;
-		// Fake friction
-		easeVelocity.z = 0.0f;
-		easeVelocity.y = rb2d.velocity.y;
-		easeVelocity.x *= 0.6f;
-		rb2d.velocity = easeVelocity;
+			////////////////////
+			// Generate fake friction
+			////////////////////
+			Vector3 frictionVector = rb2d.velocity;
+			frictionVector.x *= friction;
+			frictionVector.y = rb2d.velocity.y;
+			frictionVector.z = 0f;
+			rb2d.velocity = frictionVector;
 		}
+
+		if(damaged) {
+			deathTimer -= Time.deltaTime;
+			rb2d.velocity = Vector3.zero;
+		}
+		if(deathTimer <= 0f) {
+			Die();
+		}
+
 	}
 
+	////////////////////
+	// Check player distance
+	////////////////////
 	void AwakeCheck(float distance) {
-		
-		// In range
-		if(distance < awakeRange) {
+
+		if(distance <= awakeRange) {
 			awake = true;
 		}
-
-		// Not in range
 		if(distance > awakeRange) {
 			awake = false;
 		}
 
 	}
 
-	public void Attack() {
+	private void Die() {
 
-		attackCd += Time.deltaTime;
-		leapCd += Time.deltaTime;
+		Object.Destroy(this.gameObject);
 
-		if(attackCd >= attackInterval) {
-			anim.SetBool("AttackReady", false);
-			attackReady = false;
-			anim.SetBool("Attacking", true);
+	}
 
-			leap = true;
+	////////////////////
+	// Allows wolf to be damaged by other scripts
+	////////////////////
+	public void Damage(int dmg) {
 
-			Debug.Log("Wolf attack");
+		currentHealth -= dmg;
+		
+	}
 
-			anim.Play("Wolf_Attack");
-			WolfAttack.enabled = true;
-			// Can't attack multiple times in a row
-			attackCd = 0f;
+	////////////////////
+	// Knockback, fall on spot wolf.position.y is frozen
+	////////////////////
+	public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir) {
 
+		if(!damaged); {
+			anim.Play("Wolf_Knockback");
 		}
-		anim.SetBool("Attacking", false);
-
-		// Need leap timer
-		if(leapCd >= 3) {
-			leap = false;
-			leapCd = 0;
-			
+		float timer = 0f;
+		while(knockDur > timer) {
+			knockbacked = true;
+			timer += Time.deltaTime;
+			// rb2d.AddForce(new Vector3(knockbackDir.x * (knockbackPwr), knockbackDir.y * knockbackPwr, transform.position.z));
+			rb2d.velocity = Vector3.zero;
 		}
-		// attacking = false;
-		// WolfAttack.enabled = false;
+		knockbacked = false;
+
+		yield return 0;
 
 	}
 

@@ -22,6 +22,22 @@ GameObject:
   - component: {fileID: 61828403699822434}
   m_Layer: 0
   m_Name: Hitbox
+  m_TagString: EnemyHitbox
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1494890434783814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4555402612352674}
+  - component: {fileID: 61829400623977816}
+  m_Layer: 0
+  m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,7 +57,7 @@ GameObject:
   - component: {fileID: 114258986594318554}
   m_Layer: 0
   m_Name: Enemy_Wolf
-  m_TagString: Untagged
+  m_TagString: Wolf
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,6 +71,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4686009060690414}
   - component: {fileID: 61427682864360848}
+  - component: {fileID: 114929633111727854}
   m_Layer: 0
   m_Name: WolfAttack
   m_TagString: AttackHitbox
@@ -62,6 +79,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &4555402612352674
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1494890434783814}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.1, y: 0.6, z: 0}
+  m_LocalScale: {x: 0.96250004, y: 0.8125003, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4657403396976484}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4562251883710614
 Transform:
   m_ObjectHideFlags: 1
@@ -73,7 +103,7 @@ Transform:
   m_LocalScale: {x: 2.907942, y: 1.6209605, z: 1}
   m_Children: []
   m_Father: {fileID: 4657403396976484}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4657403396976484
 Transform:
@@ -82,11 +112,12 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1756148678178766}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20.89, y: -4.37, z: 0}
+  m_LocalPosition: {x: 20.57, y: -4.37, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4562251883710614}
+  - {fileID: 4555402612352674}
   - {fileID: 4686009060690414}
+  - {fileID: 4562251883710614}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -173,6 +204,31 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!61 &61829400623977816
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1494890434783814}
+  m_Enabled: 0
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!95 &95224858589657244
 Animator:
   serializedVersion: 3
@@ -202,26 +258,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 0
-  maxHealth: 50
+  maxHealth: 10
   distance: 0
-  awakeRange: 10
-  attackRange: 3
-  speed: 5
+  speed: 12
   maxSpeed: 4
-  attackReadyCounter: 0
-  attackReadyDuration: 3
-  attackTimeCounter: 0
-  attackCd: 2
-  leapTimeCounter: 0
-  leapCd: 0.1
   leapPower: 100
+  awakeRange: 12
+  attackRange: 5
+  attackWaitCounter: 0
+  attackWaitDuration: 4
+  attackDurationCounter: 0
+  attackDuration: 0.2
   friction: 0.6
+  deathTimer: 3
   awake: 0
   attacking: 0
   leap: 0
   attackReady: 0
+  knockbacked: 0
+  damaged: 0
+  rb2d: {fileID: 0}
   target: {fileID: 0}
+  attackPoint: {fileID: 0}
   anim: {fileID: 0}
+  WolfAttack: {fileID: 0}
+--- !u!114 &114929633111727854
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1955772788606404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c959734f981f09b4c9a73d4feb358eca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 1
+  knockbackDuration: 0.02
+  knockbackPower: 200
 --- !u!212 &212493120923088110
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -1,16 +1,15 @@
 fileFormatVersion: 2
-guid: d8f5093a1414f764d938d5859b5031b0
-timeCreated: 1494184008
+guid: a19b16cec57c5a54792b0d5f5306f0c8
+timeCreated: 1494177862
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: main_fall_0
-    21300002: main_fall_1
-    21300004: main_fall_2
-    21300006: main_fall_3
-    21300008: main_fall_4
-    21300010: main_fall_5
-    21300012: main_fall_6
+    21300000: Hearts_0
+    21300002: Hearts_1
+    21300004: Hearts_2
+    21300006: Hearts_3
+    21300008: Hearts_4
+    21300010: Hearts_5
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -47,7 +46,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 18
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -73,22 +72,6 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
-  - buildTarget: iPhone
-    maxTextureSize: 2048
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-  - buildTarget: Android
-    maxTextureSize: 2048
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
   - buildTarget: WebGL
     maxTextureSize: 2048
     textureFormat: -1
@@ -101,93 +84,80 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: main_fall_0
+      name: Hearts_0
       rect:
         serializedVersion: 2
-        x: 37
-        y: 260
-        width: 21
-        height: 45
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 2
+        y: 77
+        width: 83
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: main_fall_1
+      name: Hearts_1
       rect:
         serializedVersion: 2
-        x: 58
-        y: 261
-        width: 16
-        height: 32
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 2
+        y: 62
+        width: 83
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: main_fall_2
+      name: Hearts_2
       rect:
         serializedVersion: 2
-        x: 75
-        y: 252
-        width: 76
-        height: 41
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 2
+        y: 47
+        width: 83
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: main_fall_3
+      name: Hearts_3
       rect:
         serializedVersion: 2
-        x: 31
-        y: 110
-        width: 104
-        height: 110
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 2
+        y: 32
+        width: 83
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: main_fall_4
+      name: Hearts_4
       rect:
         serializedVersion: 2
-        x: 148
-        y: 110
-        width: 82
-        height: 112
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 2
+        y: 17
+        width: 83
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: main_fall_5
+      name: Hearts_5
       rect:
         serializedVersion: 2
-        x: 251
-        y: 112
-        width: 94
-        height: 106
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: main_fall_6
-      rect:
-        serializedVersion: 2
-        x: 374
-        y: 112
-        width: 132
-        height: 46
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 2
+        y: 2
+        width: 83
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
