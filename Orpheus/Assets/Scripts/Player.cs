@@ -108,7 +108,9 @@ public class Player : MonoBehaviour {
 		Vector3 easeVelocity = rb2d.velocity;
 
 		// Moving the player
-		rb2d.AddForce((Vector2.right * speed) * horizontal);
+		if(!crouching) {
+			rb2d.AddForce((Vector2.right * speed) * horizontal);
+		}
 
 		// Limit max speed
 		if(rb2d.velocity.x > maxSpeed) {

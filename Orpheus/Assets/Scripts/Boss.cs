@@ -10,7 +10,7 @@ public class Boss : MonoBehaviour {
 
 	//floats
 	public float distance;
-	public float wakeRange;
+	public float wakeRange = 8;
 	public float shootInterval;
 	public float bulletSpeed = 100;
 	public float bulletTimer;
@@ -36,6 +36,11 @@ public class Boss : MonoBehaviour {
 		anim.SetBool("Awake", awake);
 
 		RangeCheck();
+
+		if(awake) {
+			Attack();
+			
+		}
 	}
 
 	void RangeCheck(){
