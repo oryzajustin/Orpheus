@@ -10,6 +10,9 @@ TagManager:
   - Headbutt
   - SpecialPunch1
   - AirKick
+  - AttackHitbox
+  - Ground
+  - AttackTrigger
   layers:
   - Default
   - TransparentFX

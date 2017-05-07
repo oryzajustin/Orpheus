@@ -38,7 +38,7 @@ public class Boss : MonoBehaviour {
 		RangeCheck();
 
 		if(awake) {
-			Attack();
+			// Attack();
 			
 		}
 	}
