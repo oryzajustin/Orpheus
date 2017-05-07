@@ -4,134 +4,172 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
-	// Floats
-	public float maxSpeed = 6;
-	public float speed = 100f;
-	public float jumpPower = 300f;
-	public float friction = 0.7f;
-	public float gravity = 0.5f;
-	private int currentScale = 2;
+	////////////////////
+	// Controls
+	////////////////////
+	private KeyCode Left = KeyCode.A;
+	private KeyCode Right = KeyCode.D;
+	private KeyCode Jump = KeyCode.Space;
+	private KeyCode Down = KeyCode.S;
+	private KeyCode Charge = KeyCode.LeftShift;
 
-	// Stats
+	////////////////////
+	// Player sprite scaling
+	////////////////////
+	private int scale = 2;
+
+	////////////////////
+	// Floats
+	////////////////////
 	public float health = 100f;
 	public float damage = 20f;
-	public float maxCharge = 100f;
+	public float speed = 100f;
+	public float maxSpeed = 6f;
+	public float jumpPower = 300f;
 	public float currentCharge = 0f;
+	public float maxCharge = 100f;
 	public float chargeAmount = 10f;
-	// One second, 10 sec for max charge
-	public float chargeTimer = 1.0f;
-	public float chargeTolerance = 2.0f;
+	public float chargeSpeed = 1.0f; // Every one second
+	public float chargeCounter = 0f;
+	public float chargeTolerance = 2.0f; // Amount of movement allowed
+	public float friction = 0.7f;
 
+	////////////////////
 	// Booleans
-	public bool grounded;
-	public bool charging;
-	public bool crouching;
+	////////////////////
+	public bool grounded = false;
+	public bool charging = false;
+	public bool crouched = false;
 
+	////////////////////
 	// References
+	////////////////////
 	private Rigidbody2D rb2d;
 	private Animator anim;
 
-	// Use this for initialization
 	void Start() {
+
 		rb2d = gameObject.GetComponent<Rigidbody2D>();
 		anim = gameObject.GetComponent<Animator>();
+
 	}
 	
-	// Update is called once per frame
 	void Update() {
+
+		////////////////////
 		// Current horizontal speed
+		////////////////////
 		float currentSpeed = Mathf.Abs(rb2d.velocity.x);
 
+		////////////////////
 		// Set animation parameters
-		anim.SetBool("Grounded", grounded);
-		anim.SetBool("Charge", charging);
+		////////////////////
 		anim.SetFloat("Speed", currentSpeed);
+		anim.SetBool("Grounded", grounded);
+		anim.SetBool("Charging", charging);
+		anim.SetBool("Crouched", crouched);
 
-		// Change sprite direction
-		if(Input.GetAxis("Horizontal") < -0.1f) {
-			transform.localScale = new Vector3(-(currentScale), currentScale, 1);
+		////////////////////
+		// Change sprite direction based on key direction
+		////////////////////
+		if(Input.GetKeyDown(Left)) {
+			transform.localScale = new Vector3(-scale, scale, 1); // Vector3 for layer ordering w/ z-axis
 		}
-		if(Input.GetAxis("Horizontal") > 0.1f) {
-			transform.localScale = new Vector3(currentScale, currentScale, 1);
+		if(Input.GetKeyDown(Right)) {
+			transform.localScale = new Vector3(scale, scale, 1);
 		}
 
-		// Jump (single only)
-		if(Input.GetButtonDown("Jump") && grounded) {
+		////////////////////
+		// Jump (limited to one)
+		////////////////////
+		if(Input.GetKeyDown(Jump) && grounded) {
 			rb2d.AddForce(Vector2.up * jumpPower);
 		}
 
-		// Crouch, stop movement 
-		if(Input.GetKeyDown("s") && grounded) {
-			crouching = true;
-			anim.SetBool("Crouch", crouching);
+		////////////////////
+		// Crouch, stop all movement 
+		////////////////////
+		if(Input.GetKeyDown(Down) && grounded) {
+			crouched = true;
+			anim.SetBool("Crouched", crouched);
+		}
+		if(Input.GetKeyUp(Down)) {
+			crouched = false;
+			anim.SetBool("Crouched", crouched);
 		}
 
-		if(Input.GetKeyUp("s")) {
-			crouching = false;
-			anim.SetBool("Crouch", crouching);
-		}
-
-		// Energy charge (left shift)
-		if(Input.GetKeyDown(KeyCode.LeftShift) && grounded && currentSpeed <= chargeTolerance) {
-
+		////////////////////
+		// Toggle charge mode for combo bar
+		////////////////////
+		if(Input.GetKeyDown(Charge) && grounded && currentSpeed <= chargeTolerance) {
 			charging = true;
-			anim.SetBool("Charge", charging);
-
-			anim.Play("player charge");
+			anim.SetBool("Charging", charging);
+			anim.Play("player charge"); // Go straight into charge, keep Animator clean
 		}
-
-		if(Input.GetKeyUp(KeyCode.LeftShift) || !grounded || currentSpeed > chargeTolerance) {
-
+		if(Input.GetKeyUp(Charge) || !grounded || currentSpeed > chargeTolerance) {
 			charging = false;
-			anim.SetBool("Charge", charging);
+			anim.SetBool("Charging", charging); // Leave animation in Animator
 		}
 
-		// Charging check
+		////////////////////
+		// Charging logic
+		////////////////////
 		if(charging) {
-			if(chargeTimer > 0) {
-				chargeTimer -= Time.deltaTime;
+			if(chargeCounter < chargeSpeed) {
+				chargeCounter += Time.deltaTime; // Check elapsed time since charge started
 			}
 			else {
-				if(currentCharge < 100) {
+				if(currentCharge < maxCharge) {
 					currentCharge += chargeAmount;
+					if(currentCharge > maxCharge) {
+						currentCharge = maxCharge;
+					}
 				}
-				// Reset timer
-				chargeTimer = 1.0f;
+				chargeCounter = 0f; // Reset timer
 			}
+			
 		}
-				
+
 	}
 
 	void FixedUpdate() {
-		float horizontal = Input.GetAxis("Horizontal");
-		// Gravity and friction
-		Vector3 easeVelocity = rb2d.velocity;
 
-		// Moving the player
-		if(!crouching) {
-			rb2d.AddForce((Vector2.right * speed) * horizontal);
+		////////////////////
+		// Move the player, only if they aren't croucheded
+		////////////////////
+		float direction = Input.GetAxis("Horizontal");
+		if(!crouched) {
+			rb2d.AddForce((Vector2.right * speed) * direction);
 		}
 
-		// Limit max speed
-		if(rb2d.velocity.x > maxSpeed) {
+		////////////////////
+		// Limit max speed while retaining jump/fall speed
+		////////////////////
+		if(rb2d.velocity.x > maxSpeed) { // Limit right-wards movement
 			rb2d.velocity = new Vector2(maxSpeed, rb2d.velocity.y);
 		}
-
-		if(rb2d.velocity.x < -maxSpeed) {
+		if(rb2d.velocity.x < -maxSpeed) { // Limit left-wards movement
 			rb2d.velocity = new Vector2(-maxSpeed, rb2d.velocity.y);
 		}
 
-		// Fake friction
+		////////////////////
+		// Simulate friction on ground, doesn't affect fall speed
+		////////////////////
+		Vector3 currentVelocity = rb2d.velocity;
 		if(grounded) {
-			// Doesn't affect fall speed, z axis isn't used, x is 75% of speed
-			easeVelocity.z = 0.0f;
-			easeVelocity.y = rb2d.velocity.y;
-			easeVelocity.x *= friction;
-			rb2d.velocity = easeVelocity;
+			currentVelocity.x *= friction;
+			currentVelocity.y = rb2d.velocity.y;
+			currentVelocity.z = 0f;
+			rb2d.velocity = currentVelocity;
 		}
 
-		if(crouching) {
+		////////////////////
+		// Crouch stops all movement
+		////////////////////
+		if(crouched) {
 			rb2d.velocity = Vector3.zero;
 		}
+
 	}
+
 }

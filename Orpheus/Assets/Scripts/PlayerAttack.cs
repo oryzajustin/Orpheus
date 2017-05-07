@@ -4,20 +4,34 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour {
 
+	////////////////////
 	// Controls
-	private string primaryAttackKey = "j";
-	private string secondaryAttackKey = "k";
+	////////////////////
+	private KeyCode PrimaryAttack = KeyCode.J;
+	private KeyCode SecondaryAttack = KeyCode.K;
 
-	// Check active combo and next move
-	public bool grounded;
-	private bool attacking = false;
+	////////////////////
+	// Consider using switch case statement
+	////////////////////
 	private int primaryComboNum = 1;
 
-	// Controls duration of attacks
-	private float attackTimer;
-	private float attackCd = 0.1f;
+	////////////////////
+	// Floats
+	////////////////////
+	private float attackTimeCounter;
+	private float attackCd = 1f;
 
-	// Attack hitboxes
+	////////////////////
+	// Booleans
+	////////////////////
+	private bool primaryComboActive = false;
+	public bool attacking = false;
+	public bool grounded = false;
+
+	////////////////////
+	// References
+	////////////////////
+	private Animator anim;
 	public Collider2D MainPunch1;
 	public Collider2D MainPunch2;
 	public Collider2D MainPunch3;
@@ -25,179 +39,113 @@ public class PlayerAttack : MonoBehaviour {
 	public Collider2D SpecialPunch1;
 	public Collider2D AirKick;
 
-	private Animator anim;
 
 	void Awake() {
+
 		anim = gameObject.GetComponent<Animator>();
-
-		// Get hitboxes
-		GameObject objMainPunch1 = GameObject.FindWithTag("MainPunch1");
- 		if(objMainPunch1 != null) {
- 			MainPunch1 = objMainPunch1.GetComponent<Collider2D>();
- 		}
-
-		GameObject objMainPunch2 = GameObject.FindWithTag("MainPunch2");
- 		if(objMainPunch2 != null) {
- 			MainPunch2 = objMainPunch2.GetComponent<Collider2D>();
- 		}
-
-		GameObject objMainPunch3 = GameObject.FindWithTag("MainPunch3");
- 		if(objMainPunch3 != null) {
- 			MainPunch3 = objMainPunch3.GetComponent<Collider2D>();
- 		}
-
-		GameObject objHeadbutt = GameObject.FindWithTag("Headbutt");
- 		if(objHeadbutt != null) {
- 			Headbutt = objHeadbutt.GetComponent<Collider2D>();
- 		}
-
-		GameObject objSpecialPunch1 = GameObject.FindWithTag("SpecialPunch1");
- 		if(objSpecialPunch1 != null) {
- 			SpecialPunch1 = objSpecialPunch1.GetComponent<Collider2D>();
- 		}
-
-		GameObject objAirKick = GameObject.FindWithTag("AirKick");
- 		if(objAirKick != null) {
- 			AirKick = objAirKick.GetComponent<Collider2D>();
- 		}
-
-		// Disable hitbox colliders
-		MainPunch1.enabled = false;
-		MainPunch2.enabled = false;
-		MainPunch3.enabled = false;
-		Headbutt.enabled = false;
-		SpecialPunch1.enabled = false;
-		AirKick.enabled = false;
 
 	}
 	
-	// Update is called once per frame
 	void Update () {
 
-		anim.SetBool("Grounded", grounded);
-
-		// beat = getBeat();
-
+		////////////////////
+		// Ground only melee moves
+		////////////////////
 		if(grounded) {
-			// Primary combo - Headbutt, this must be at top to check comboNum
-			if(Input.GetKeyDown(primaryAttackKey) && primaryComboNum == 4) {
+
+			////////////////////
+			// Primary attack - light punch and combo
+			////////////////////
+			if(Input.GetKeyDown(PrimaryAttack) && !attacking) {
 				attacking = true;
+		    	attackTimeCounter = 0;
+		    	anim.Play("player punch");	
 
-				// Reset combo, this is the last move
-				primaryComboNum = 1;
-				attackTimer = attackCd;	
-
-				// Play anim
-				anim.Play("player headbutt");
-
-				// Current hitbox
-				Headbutt.enabled = true;
-				anim.SetBool("Headbutt", attacking);
+		    	primaryComboActive = true;
+		    	primaryComboNum++;
 			}
 
-			// Primary combo - Punch 3
-			if(Input.GetKeyDown(primaryAttackKey) && primaryComboNum == 3) {
+			////////////////////
+			// Primary combo - no CD
+			////////////////////
+		    else if(Input.GetKeyDown(PrimaryAttack) && primaryComboActive && attacking) {
+		    	switch(primaryComboNum) {
+		    		case 1: 
+				    	primaryComboNum++;
+				    	anim.Play("player punch");	
+		    			break;
+		    		case 2:
+						primaryComboNum++;
+						anim.Play("player punch 2");
+						break;
+					case 3:
+						primaryComboNum++;
+						anim.Play("player punch 3");
+						break;
+					case 4: // Reset combo and finish attacking
+		    			primaryComboActive = false;
+						primaryComboNum = 1; 
+						anim.Play("player headbutt");
+						break;
+					default:
+						if(primaryComboNum > 4) {
+							primaryComboNum = 1;
+						}
+						else {
+					    	primaryComboNum++;
+						}
+				    	anim.Play("player punch");	
+						break;
+		    	}
+				attackTimeCounter = 0;	
+		    }
+
+			////////////////////
+			// Secondary attack - heavy punch
+			////////////////////
+			if(Input.GetKeyDown(SecondaryAttack) && (!attacking || primaryComboActive)) {
 				attacking = true;
-
-				// Go to next move
-				primaryComboNum++;
-				attackTimer = attackCd;	
-
-				anim.Play("player punch 3");
-
-				MainPunch3.enabled = true;
-				anim.SetBool("MainPunch3", attacking);
-			}
-
-			// Primary combo - Punch 2
-			if(Input.GetKeyDown(primaryAttackKey) && primaryComboNum == 2) {
-				attacking = true;
-
-				primaryComboNum++;
-				attackTimer = attackCd;	
-
-				anim.Play("player punch 2");
-
-				MainPunch2.enabled = true;
-				anim.SetBool("MainPunch2", attacking);
-			}
-
-			// Primary attack - punch 1
-			if(Input.GetKeyDown(primaryAttackKey) && !attacking) {
-				attacking = true;
-
-				primaryComboNum++;
-				attackTimer = attackCd;	
-
-				anim.Play("player punch");
-
-				MainPunch1.enabled = true;
-				anim.SetBool("MainPunch1", attacking);
-			}
-
-
-			// Secondary attack - 'Heavy' punch
-			if(Input.GetKeyDown(secondaryAttackKey) && !attacking) {
-				attacking = true;
-
-				// No combo moves, but set hitbox duration
-				attackTimer = attackCd + 0.3f;	
-
+				primaryComboActive = false;
+				attackTimeCounter = 0;	
 				anim.Play("player special punch");
-
-				SpecialPunch1.enabled = true;
-				anim.SetBool("SpecialPunch1", attacking);
 			}
 		}
 
-		// Not grounded
+		////////////////////
+		// Not grounded moves
+		////////////////////
 		else {
+
+			////////////////////
 			// Air kick
-			if(Input.GetKeyDown("j") && !attacking) {
+			////////////////////
+			if(Input.GetKeyDown(PrimaryAttack) && !attacking) {
 				attacking = true;
-
-				// No combo moves, but set hitbox duration
-				attackTimer = attackCd + 1f;	
-
+				attackTimeCounter = 0;	
 				anim.Play("player airkick");
-
-				AirKick.enabled = true;
-				anim.SetBool("AirKick", attacking);
 			}
 		}
 
-
-
+		////////////////////
+		// Check if still attacking, else reset all counters/states
+		////////////////////
 		if(attacking) {
-			if(attackTimer > 0) {
-				attackTimer -= Time.deltaTime;
+			if(attackTimeCounter < attackCd) {
+				attackTimeCounter += Time.deltaTime;
 			}
 			else {
 				attacking = false;
-
-				// Turn off all hitboxes
-				MainPunch1.enabled = false;
-				anim.SetBool("MainPunch1", attacking);
-
-				MainPunch2.enabled = false;
-				anim.SetBool("MainPunch2", attacking);
-
-				MainPunch3.enabled = false;
-				anim.SetBool("MainPunch3", attacking);
-
-				Headbutt.enabled = false;
-				anim.SetBool("Headbutt", attacking);
-
-				SpecialPunch1.enabled = false;
-				anim.SetBool("SpecialPunch1", attacking);
-
-				AirKick.enabled = false;
-				anim.SetBool("AirKick", attacking);
+				primaryComboNum = 1;
+				primaryComboActive = false;
+				attackTimeCounter = 0;
 			}
 		}
 
+		////////////////////
+		// Set attacking to last move used
+		////////////////////
 		anim.SetBool("Attacking", attacking);
 
-		}
+	}	
 
 }
