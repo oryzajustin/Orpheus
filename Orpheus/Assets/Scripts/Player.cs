@@ -17,11 +17,12 @@ public class Player : MonoBehaviour {
 	// Player sprite scaling
 	////////////////////
 	private int scale = 2;
+	public int maxHealth = 5;
+	public int currentHealth;
 
 	////////////////////
 	// Floats
 	////////////////////
-	public float health = 100f;
 	public float damage = 20f;
 	public float speed = 100f;
 	public float maxSpeed = 6f;
@@ -33,6 +34,7 @@ public class Player : MonoBehaviour {
 	public float chargeCounter = 0f;
 	public float chargeTolerance = 2.0f; // Amount of movement allowed
 	public float friction = 0.7f;
+	public float deathTimer = 3f;
 
 	////////////////////
 	// Booleans
@@ -40,6 +42,8 @@ public class Player : MonoBehaviour {
 	public bool grounded = false;
 	public bool charging = false;
 	public bool crouched = false;
+	public bool knockbacked = false;
+	public bool dead = false;
 
 	////////////////////
 	// References
@@ -51,6 +55,8 @@ public class Player : MonoBehaviour {
 
 		rb2d = gameObject.GetComponent<Rigidbody2D>();
 		anim = gameObject.GetComponent<Animator>();
+
+		currentHealth = maxHealth;
 
 	}
 	
@@ -69,76 +75,97 @@ public class Player : MonoBehaviour {
 		anim.SetBool("Charging", charging);
 		anim.SetBool("Crouched", crouched);
 
-		////////////////////
-		// Change sprite direction based on key direction
-		////////////////////
-		if(Input.GetKeyDown(Left)) {
-			transform.localScale = new Vector3(-scale, scale, 1); // Vector3 for layer ordering w/ z-axis
-		}
-		if(Input.GetKeyDown(Right)) {
-			transform.localScale = new Vector3(scale, scale, 1);
-		}
-
-		////////////////////
-		// Jump (limited to one)
-		////////////////////
-		if(Input.GetKeyDown(Jump) && grounded) {
-			rb2d.AddForce(Vector2.up * jumpPower);
-		}
-
-		////////////////////
-		// Crouch, stop all movement 
-		////////////////////
-		if(Input.GetKeyDown(Down) && grounded) {
-			crouched = true;
-			anim.SetBool("Crouched", crouched);
-		}
-		if(Input.GetKeyUp(Down)) {
-			crouched = false;
-			anim.SetBool("Crouched", crouched);
-		}
-
-		////////////////////
-		// Toggle charge mode for combo bar
-		////////////////////
-		if(Input.GetKeyDown(Charge) && grounded && currentSpeed <= chargeTolerance) {
-			charging = true;
-			anim.SetBool("Charging", charging);
-			anim.Play("player charge"); // Go straight into charge, keep Animator clean
-		}
-		if(Input.GetKeyUp(Charge) || !grounded || currentSpeed > chargeTolerance) {
-			charging = false;
-			anim.SetBool("Charging", charging); // Leave animation in Animator
-		}
-
-		////////////////////
-		// Charging logic
-		////////////////////
-		if(charging) {
-			if(chargeCounter < chargeSpeed) {
-				chargeCounter += Time.deltaTime; // Check elapsed time since charge started
+		if(!knockbacked) {
+			////////////////////
+			// Change sprite direction based on key direction
+			////////////////////
+			if(Input.GetKeyDown(Left)) {
+				transform.localScale = new Vector3(-scale, scale, 1); // Vector3 for layer ordering w/ z-axis
 			}
-			else {
-				if(currentCharge < maxCharge) {
-					currentCharge += chargeAmount;
-					if(currentCharge > maxCharge) {
-						currentCharge = maxCharge;
-					}
+			if(Input.GetKeyDown(Right)) {
+				transform.localScale = new Vector3(scale, scale, 1);
+			}
+
+			////////////////////
+			// Jump (limited to one)
+			////////////////////
+			if(Input.GetKeyDown(Jump) && grounded) {
+				rb2d.AddForce(Vector2.up * jumpPower);
+			}
+
+			////////////////////
+			// Crouch, stop all movement 
+			////////////////////
+			if(Input.GetKeyDown(Down) && grounded) {
+				crouched = true;
+				anim.SetBool("Crouched", crouched);
+			}
+			if(Input.GetKeyUp(Down)) {
+				crouched = false;
+				anim.SetBool("Crouched", crouched);
+			}
+
+			////////////////////
+			// Toggle charge mode for combo bar
+			////////////////////
+			if(Input.GetKeyDown(Charge) && grounded && currentSpeed <= chargeTolerance) {
+				charging = true;
+				anim.SetBool("Charging", charging);
+				anim.Play("player charge"); // Go straight into charge, keep Animator clean
+			}
+			if(Input.GetKeyUp(Charge) || !grounded || currentSpeed > chargeTolerance) {
+				charging = false;
+				anim.SetBool("Charging", charging); // Leave animation in Animator
+			}
+
+			////////////////////
+			// Charging logic
+			////////////////////
+			if(charging) {
+				if(chargeCounter < chargeSpeed) {
+					chargeCounter += Time.deltaTime; // Check elapsed time since charge started
 				}
-				chargeCounter = 0f; // Reset timer
+				else {
+					if(currentCharge < maxCharge) {
+						currentCharge += chargeAmount;
+						if(currentCharge > maxCharge) {
+							currentCharge = maxCharge;
+						}
+					}
+					chargeCounter = 0f; // Reset timer
+				}
+				
 			}
-			
+		}
+
+		////////////////////
+		// Check player health
+		////////////////////
+		if(currentHealth > maxHealth) {
+			currentHealth = maxHealth;
+		}
+		if(currentHealth <= 0) {
+			anim.Play("player death");
+			dead = true;
 		}
 
 	}
 
 	void FixedUpdate() {
 
+		if(dead) {
+			deathTimer -= Time.deltaTime;
+			rb2d.velocity = Vector3.zero;
+		}
+		if(deathTimer <= 0f) {
+			Die();
+		}
+
 		////////////////////
-		// Move the player, only if they aren't croucheded
+		// Move the player, only if they aren't crouched
 		////////////////////
 		float direction = Input.GetAxis("Horizontal");
-		if(!crouched) {
+		if(!crouched && !knockbacked) {
 			rb2d.AddForce((Vector2.right * speed) * direction);
 		}
 
@@ -169,6 +196,42 @@ public class Player : MonoBehaviour {
 		if(crouched) {
 			rb2d.velocity = Vector3.zero;
 		}
+
+	}
+
+	////////////////////
+	// Restarts the game, use scene manager later
+	////////////////////
+	void Die() {
+
+		Application.LoadLevel(Application.loadedLevel);
+
+	}
+
+	////////////////////
+	// Allows player to be damaged by other scripts
+	////////////////////
+	public void Damage(int dmg) {
+
+		currentHealth -= dmg;
+
+	}
+
+	////////////////////
+	// Knockback
+	////////////////////
+	public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir) {
+
+		anim.Play("player knockback");
+		float timer = 0f;
+		while(knockDur > timer) {
+			knockbacked = true;
+			timer += Time.deltaTime;
+			rb2d.AddForce(new Vector3(knockbackDir.x * -500, knockbackDir.y * knockbackPwr, transform.position.z));
+		}
+		knockbacked = false;
+
+		yield return 0;
 
 	}
 

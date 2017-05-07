@@ -13,6 +13,10 @@ TagManager:
   - AttackHitbox
   - Ground
   - AttackTrigger
+  - Health
+  - PlayerHitbox
+  - Wolf
+  - EnemyHitbox
   layers:
   - Default
   - TransparentFX
