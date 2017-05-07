@@ -19,7 +19,7 @@ public class ScrollingBackground : MonoBehaviour
 
     public void Start()
     {
-        cameraTransform = Camera.main.transform;
+        cameraTransform = UnityEngine.Camera.main.transform;
         lastCameraX = cameraTransform.position.x;
         layers = new Transform[transform.childCount];
 
