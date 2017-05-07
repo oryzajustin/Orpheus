@@ -12,18 +12,7 @@ public class Beat : MonoBehaviour
 
     //Speeds of the beats
     private float speed;
-    private float[] bpm = new float[] { 130f, 120f, 141f, 166.76f, 90.15f, 140.01f, 129.95f, 149.81f };
-    /* Songs in order
-        0.  Destractor
-        1.  BossMain
-        2.  ChipTune
-        3.  Mercury
-        4.  Jump to Win
-        5.  Pocket Destroyer
-        6.  Unending Strike
-        7.  Venus
-     */
-    public int song;
+    public float bpm;
 
     //Location and orientation of the new beats to be spawned
     private Vector2 loc;
@@ -37,15 +26,14 @@ public class Beat : MonoBehaviour
         beat_Collider = GetComponent<Collider2D>();
 
         //Spead of beats
-        song = 7;
-        speed = bpm[song] / 15;
+        speed = bpm / 15;
 
         //Location for new beats to be spawned
         loc = new Vector2(transform.position.x, transform.position.y);
         rot = new Quaternion(0, 0, 0, 0);
 
         //Calls Instantiate function for 0.5s and repeats every 0s
-        InvokeRepeating("Instantiate", 60 / bpm[song], 0);
+        InvokeRepeating("Instantiate", 60 / bpm, 0);
     }
 
     // Update is called once per frame

@@ -47,6 +47,7 @@ public class Player : MonoBehaviour {
 	private Rigidbody2D rb2d;
 	private Animator anim;
 
+
 	void Start() {
 
 		rb2d = gameObject.GetComponent<Rigidbody2D>();
