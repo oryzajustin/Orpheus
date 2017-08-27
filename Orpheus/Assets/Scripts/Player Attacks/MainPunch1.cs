@@ -21,6 +21,7 @@ public class MainPunch1 : MonoBehaviour {
 			wolf.Damage(damage);
 			StartCoroutine(wolf.Knockback(knockbackDuration, knockbackPower, wolf.transform.position));
 
+
 		}
 
 	}

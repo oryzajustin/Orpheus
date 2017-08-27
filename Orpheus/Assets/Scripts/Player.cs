@@ -76,7 +76,7 @@ public class Player : MonoBehaviour {
 		anim.SetBool("Charging", charging);
 		anim.SetBool("Crouched", crouched);
 
-		if(!knockbacked) {
+		if(!knockbacked && !dead) {
 			////////////////////
 			// Change sprite direction based on key direction
 			////////////////////
@@ -139,6 +139,9 @@ public class Player : MonoBehaviour {
 			}
 		}
 
+		if(knockbacked) {
+		}
+
 		////////////////////
 		// Check player health
 		////////////////////
@@ -166,7 +169,7 @@ public class Player : MonoBehaviour {
 		// Move the player, only if they aren't crouched
 		////////////////////
 		float direction = Input.GetAxis("Horizontal");
-		if(!crouched && !knockbacked) {
+		if(!crouched && !knockbacked && !dead) {
 			rb2d.AddForce((Vector2.right * speed) * direction);
 		}
 
@@ -194,7 +197,7 @@ public class Player : MonoBehaviour {
 		////////////////////
 		// Crouch stops all movement
 		////////////////////
-		if(crouched) {
+		if(crouched || dead) {
 			rb2d.velocity = Vector3.zero;
 		}
 
@@ -224,11 +227,12 @@ public class Player : MonoBehaviour {
 	public IEnumerator Knockback(float knockDur, float knockbackPwr, Vector3 knockbackDir) {
 
 		anim.Play("player knockback");
+		
 		float timer = 0f;
 		while(knockDur > timer) {
 			knockbacked = true;
 			timer += Time.deltaTime;
-			rb2d.AddForce(new Vector3(knockbackDir.x * -500, knockbackDir.y * knockbackPwr, transform.position.z));
+			// rb2d.AddForce(new Vector3(knockbackDir.x * -500, knockbackDir.y * knockbackPwr, transform.position.z));
 		}
 		knockbacked = false;
 

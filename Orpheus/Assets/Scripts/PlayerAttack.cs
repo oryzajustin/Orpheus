@@ -56,6 +56,10 @@ public class PlayerAttack : MonoBehaviour {
 
 		    	primaryComboActive = true;
 		    	primaryComboNum++;
+
+		    	// Sound test
+		    	gameObject.GetComponent<AudioSource>().Play();
+
 			}
 
 			////////////////////
